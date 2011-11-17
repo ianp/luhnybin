@@ -3,8 +3,7 @@
 ;; [SQR]: http://squareup.com/
 
 (ns luhnybin.core
-  (:use [clojure.java.io :only [make-reader]]
-        [clojure.string  :only [join]])
+  (:use [clojure.java.io :only [make-reader]])
   (:gen-class))
 
 ;; First define a few small helpers…
