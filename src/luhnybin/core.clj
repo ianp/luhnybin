@@ -44,11 +44,6 @@
 
 ;; ### Searching for Potential CCNs
 
-;; A potential credit card must have 14 to 16 digits (inclusive).
-(defn- correct-len? [chars]
-  (let [n (count (filter digits chars))]
-    (and (>= n 14) (<= n 16))))
-
 (defn- num-digits [chars]
   (reduce #(if (digits %2) (inc %1) %1) 0 chars))
 
