@@ -49,11 +49,14 @@
   (let [n (count (filter digits chars))]
     (and (>= n 14) (<= n 16))))
 
+(defn- num-digits [chars]
+  (reduce #(if (digits %2) (inc %1) %1) 0 chars))
+
 ;; Find any candidates at the ste start of a string or char seq,
 ;; sorted longest to shortest.
 (defn- leading-candidates [chars]
   (loop [cs (vec (take-while ccchars chars)) acc []]
-    (let [len (count (filter digits cs))]
+    (let [len (num-digits cs)]
       (cond
         (>  len 16) (recur (pop cs) acc)
         (>= len 14) (recur (pop cs) (conj acc cs))
