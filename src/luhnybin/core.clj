@@ -86,6 +86,6 @@
     (->> nil
       (make-reader (or (first args) *in*))
       (line-seq)
-      (map #(mask-line % (process-line %) \X))
+      (pmap #(mask-line % (process-line %) \X))
       (map println))))
 
