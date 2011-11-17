@@ -51,12 +51,13 @@
 
 ;; Find any candidates at the ste start of a string or char seq,
 ;; sorted longest to shortest.
-(defn- leading-candidates
-  [chars]
-  (->> (take-while ccchars chars)
-    (reductions conj [])
-    (filter correct-len?)
-    (sort #(compare (count %2) (count %1)))))
+(defn- leading-candidates [chars]
+  (loop [cs (vec (take-while ccchars chars)) acc []]
+    (let [len (count (filter digits cs))]
+      (cond
+        (>  len 16) (recur (pop cs) acc)
+        (>= len 14) (recur (pop cs) (conj acc cs))
+        :else acc))))
 
 ;; ### The Main Public API: Process Strings, Files, or Streams
 
