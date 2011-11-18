@@ -48,13 +48,15 @@
 
 ;; Find any candidates at the ste start of a string or char seq,
 ;; sorted longest to shortest.
+
 (defn- leading-candidates [chars]
-  (loop [cs (vec (take-while ccchars chars)) acc []]
-    (let [len (num-digits cs)]
-      (cond
-        (>  len 16) (recur (pop cs) acc)
-        (>= len 14) (recur (pop cs) (conj acc cs))
-        :else acc))))
+  (loop [[head & tail] (take-while ccchars chars) seen [] acc '()]
+    (let [seen (if head (conj seen head) seen)
+          len  (num-digits seen)
+          acc  (if (>= len 14) (conj acc seen) acc)]
+      (if (or (= len 16) (nil? tail) (empty? tail))
+        acc
+        (recur tail seen acc)))))
 
 ;; ### The Main Public API: Process Strings, Files, or Streams
 
