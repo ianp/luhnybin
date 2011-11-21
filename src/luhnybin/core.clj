@@ -63,31 +63,22 @@
 (defn process-line
   "Process a line, returning the indices of any potential CC numbers."
   [line]
-  (loop [pos 0 in (seq line) to-mask #{}]
-    (if in
-      (let [c (first in)]
-        (if (digits c)
-          (let [candidates (leading-candidates in)]
-            (if-let [cc (some luhn? candidates)]
-              (recur (inc pos) (next in)
-                     (into to-mask (range pos (+ pos (count cc)))))
-              (recur (inc pos) (next in) to-mask)))
-          (recur (inc pos) (next in) to-mask)))
-      to-mask)))
-
-(defn mask-line
-  "Mask out any digits occurring at the marked positions."
-  [line to-mask mask-char]
-  (->> (seq line)
-    (map-indexed #(if (and (to-mask %1) (digits %2)) mask-char %2))
-    (apply str)))
+  (let [buf (transient (vec line))]
+    (loop [pos 0 in (seq line)]
+      (when (digits (first in))
+        (when-let [cc (some luhn? (leading-candidates in))]
+          (loop [n pos [x & xs] cc]
+            (when (digits x) (assoc! buf n \X))
+            (when xs (recur (inc n) xs)))))
+      (when (not (empty? in))
+        (recur (inc pos) (next in))))
+    (apply str (persistent! buf))))
 
 ;; Read from the file named in the first argument, or *stdin*.
 (defn -main [& args]
   (dorun
-    (->> nil
-      (make-reader (or (first args) *in*))
+    (->> (make-reader (or (first args) *in*) nil)
       (line-seq)
-      (pmap #(mask-line % (process-line %) \X))
+      (pmap #(process-line %))
       (map println))))
 
